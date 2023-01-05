@@ -330,6 +330,36 @@ func (_m *Client) GetRecordFromServiceNow(tableName string, sysID string) (*seri
 	return r0, r1, r2
 }
 
+// GetRecordsFromServiceNow provides a mock function with given fields: recordType, assignmentGroupID, serviceID
+func (_m *Client) GetRecordsFromServiceNow(recordType string, assignmentGroupID string, serviceID string) ([]*serializer.ServiceNowRecord, int, error) {
+	ret := _m.Called(recordType, assignmentGroupID, serviceID)
+
+	var r0 []*serializer.ServiceNowRecord
+	if rf, ok := ret.Get(0).(func(string, string, string) []*serializer.ServiceNowRecord); ok {
+		r0 = rf(recordType, assignmentGroupID, serviceID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*serializer.ServiceNowRecord)
+		}
+	}
+
+	var r1 int
+	if rf, ok := ret.Get(1).(func(string, string, string) int); ok {
+		r1 = rf(recordType, assignmentGroupID, serviceID)
+	} else {
+		r1 = ret.Get(1).(int)
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(string, string, string) error); ok {
+		r2 = rf(recordType, assignmentGroupID, serviceID)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 // GetStatesFromServiceNow provides a mock function with given fields: recordType
 func (_m *Client) GetStatesFromServiceNow(recordType string) ([]*serializer.ServiceNowState, int, error) {
 	ret := _m.Called(recordType)

@@ -67,6 +67,8 @@ const (
 	QueryParamUserID                           = "user_id"
 	QueryParamSubscriptionType                 = "subscription_type"
 	QueryParamSearchTerm                       = "search"
+	QueryParamAssignmentGroupID                = "assignment_group"
+	QueryParamServiceID                        = "business_service"
 	PathParamSubscriptionID                    = "subscription_id"
 	PathParamTeamID                            = "team_id"
 	PathParamRecordType                        = "record_type"
@@ -87,6 +89,7 @@ const (
 	FieldImpact               = "impact"
 	FieldName                 = "name"
 	FieldDescription          = "description"
+	FieldService              = "service"
 
 	// Websocket events
 	WSEventConnect              = "connect"
@@ -187,6 +190,7 @@ const (
 	ErrorInvalidChannelType               = "invalid channel type for performing action"
 	ErrorSearchingFilterValues            = "Error in searching for filter values in ServiceNow"
 	ErrorInvalidFilterType                = "Invalid filter type"
+	ErrorGetRecords                       = "Error in getting records from ServiceNow"
 )
 
 // kv store keys prefix

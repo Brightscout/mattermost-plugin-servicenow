@@ -54,6 +54,8 @@ func (p *Plugin) InitAPI() *mux.Router {
 	s.HandleFunc(constants.PathCheckSubscriptionsConfigured, p.checkAuth(p.checkOAuth(p.checkSubscriptionsConfiguredAPI))).Methods(http.MethodGet)
 	s.HandleFunc(constants.PathGetIncidentFields, p.checkAuth(p.checkOAuth(p.getIncidentFields))).Methods(http.MethodGet)
 	s.HandleFunc(constants.PathSearchFilterValues, p.checkAuth(p.checkOAuth(p.searchFilterValuesInServiceNow))).Methods(http.MethodGet)
+	s.HandleFunc(constants.PathGetFilteredRecords, p.checkAuth(p.checkOAuth(p.getRecordsFromServiceNow))).Methods(http.MethodGet)
+	s.HandleFunc(constants.PathShowRecord, p.checkAuth(p.checkOAuth(p.showRecord))).Methods(http.MethodGet)
 
 	// 404 handler
 	r.Handle("{anything:.*}", http.NotFoundHandler())
@@ -808,6 +810,110 @@ func (p *Plugin) searchFilterValuesInServiceNow(w http.ResponseWriter, r *http.R
 	}
 
 	p.writeJSONArray(w, statusCode, filterValues)
+}
+
+func (p *Plugin) getRecordsFromServiceNow(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	userID := r.Header.Get(constants.HeaderMattermostUserID)
+	recordType := pathParams[constants.PathParamRecordType]
+	if !constants.ValidSubscriptionRecordTypes[recordType] {
+		p.API.LogError("Invalid record type while getting records", "Record type", recordType)
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusBadRequest, Message: constants.ErrorInvalidRecordType})
+		return
+	}
+
+	channelID := r.URL.Query().Get(constants.QueryParamChannelID)
+	if channelID != "" && !model.IsValidId(channelID) {
+		p.API.LogError(constants.ErrorInvalidQueryParam, "Query param", constants.QueryParamChannelID)
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Query param %s is not valid", constants.QueryParamChannelID)})
+		return
+	}
+
+	permissionStatusCode, permissionErr := p.HasChannelPermissions(userID, channelID)
+	if permissionErr != nil {
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: permissionStatusCode, Message: permissionErr.Error()})
+		return
+	}
+
+	assignmentGroupID := r.URL.Query().Get(constants.QueryParamAssignmentGroupID)
+	serviceID := r.URL.Query().Get(constants.QueryParamServiceID)
+	client := p.GetClientFromRequest(r)
+	records, statusCode, err := client.GetRecordsFromServiceNow(recordType, assignmentGroupID, serviceID)
+	if err != nil {
+		p.API.LogError(constants.ErrorGetRecords, "Error", err.Error())
+		_ = p.handleClientError(w, r, err, false, statusCode, "", fmt.Sprintf("%s. Error: %s", constants.ErrorGetRecords, err.Error()))
+		return
+	}
+
+	if len(records) == 0 {
+		p.Ephemeral(userID, channelID, "", "No record found")
+	} else {
+		p.Ephemeral(userID, channelID, "", ParseRecordsToCommandResponse(records, recordType, p.GetPluginURL(), channelID))
+	}
+
+	p.writeJSONArray(w, statusCode, records)
+}
+
+func (p *Plugin) showRecord(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	userID := r.Header.Get(constants.HeaderMattermostUserID)
+	recordType := pathParams[constants.PathParamRecordType]
+	if !constants.ValidRecordTypesForSearching[recordType] {
+		p.API.LogError("Invalid record type while trying to get record", "Record type", recordType)
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusBadRequest, Message: constants.ErrorInvalidRecordType})
+		return
+	}
+
+	channelID := pathParams[constants.QueryParamChannelID]
+	if channelID != "" && !model.IsValidId(channelID) {
+		p.API.LogError(constants.ErrorInvalidQueryParam, "Query param", constants.QueryParamChannelID)
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Query param %s is not valid", constants.QueryParamChannelID)})
+		return
+	}
+
+	permissionStatusCode, permissionErr := p.HasChannelPermissions(userID, channelID)
+	if permissionErr != nil {
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: permissionStatusCode, Message: permissionErr.Error()})
+		return
+	}
+
+	recordID := pathParams[constants.PathParamRecordID]
+	client := p.GetClientFromRequest(r)
+	record, statusCode, err := client.GetRecordFromServiceNow(recordType, recordID)
+	if err != nil {
+		p.API.LogError(constants.ErrorGetRecord, "Error", err.Error())
+		_ = p.handleClientError(w, r, err, false, statusCode, "", fmt.Sprintf("%s. Error: %s", constants.ErrorGetRecord, err.Error()))
+		return
+	}
+
+	record.RecordType = recordType
+	if err := record.HandleNestedFields(p.getConfiguration().ServiceNowBaseURL); err != nil {
+		p.API.LogError(constants.ErrorHandlingNestedFields, "Error", err.Error())
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusInternalServerError, Message: fmt.Sprintf("%s. Error: %s", constants.ErrorHandlingNestedFields, err.Error())})
+		return
+	}
+
+	post := record.CreateSharingPost(channelID, p.botID, p.getConfiguration().ServiceNowBaseURL, p.GetPluginURL(), "")
+	post.Type = ""
+	_ = p.API.SendEphemeralPost(userID, post)
+
+	html := `
+<!DOCTYPE html>
+<html>
+	<head>
+		<script>
+			window.close();
+		</script>
+	</head>
+	<body>
+	</body>
+</html>
+`
+
+	w.Header().Set("Content-Type", "text/html")
+	if _, err := w.Write([]byte(html)); err != nil {
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusInternalServerError, Message: err.Error()})
+	}
 }
 
 func returnStatusOK(w http.ResponseWriter) {

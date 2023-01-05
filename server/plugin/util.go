@@ -112,6 +112,20 @@ func ParseSubscriptionsToCommandResponse(subscriptions []*serializer.Subscriptio
 	return sb.String()
 }
 
+func ParseRecordsToCommandResponse(records []*serializer.ServiceNowRecord, recordType, pluginURL, channelID string) string {
+	var sb strings.Builder
+	var recordsDetails strings.Builder
+	for _, r := range records {
+		recordURL := fmt.Sprintf("%s/show-record/%s/%s/%s", pluginURL, recordType, r.SysID, channelID)
+		recordsDetails.WriteString(fmt.Sprintf("\n|[%s](%s)|%s|%s|%s|", r.SysID, recordURL, constants.FormattedRecordTypes[recordType], r.Number, r.ShortDescription))
+	}
+
+	sb.WriteString("\n#### Records\n")
+	sb.WriteString("| Record ID | Record Type | Record Number | Record Short Description |\n| :----|:--------| :--------| :-----|")
+	sb.WriteString(recordsDetails.String())
+	return sb.String()
+}
+
 func GetPageAndPerPage(r *http.Request) (page, perPage int) {
 	query := r.URL.Query()
 	if val, err := strconv.Atoi(query.Get(constants.QueryParamPage)); err != nil || val < 0 {
