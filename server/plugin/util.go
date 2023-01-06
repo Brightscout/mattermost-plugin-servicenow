@@ -112,16 +112,16 @@ func ParseSubscriptionsToCommandResponse(subscriptions []*serializer.Subscriptio
 	return sb.String()
 }
 
-func ParseRecordsToCommandResponse(records []*serializer.ServiceNowRecord, recordType, pluginURL, channelID string) string {
+func ParseRecordsToCommandResponse(records []*serializer.ServiceNowRecord, recordType, serviceNowURL, channelID string) string {
 	var sb strings.Builder
 	var recordsDetails strings.Builder
 	for _, r := range records {
-		recordURL := fmt.Sprintf("%s/show-record/%s/%s/%s", pluginURL, recordType, r.SysID, channelID)
-		recordsDetails.WriteString(fmt.Sprintf("\n|[%s](%s)|%s|%s|%s|", r.SysID, recordURL, constants.FormattedRecordTypes[recordType], r.Number, r.ShortDescription))
+		recordURL := fmt.Sprintf("%s/nav_to.do?uri=%s.do?sys_id=%s", serviceNowURL, recordType, r.SysID)
+		recordsDetails.WriteString(fmt.Sprintf("\n|[%s](%s)|%s|%s|%s|", r.Number, recordURL, r.SysID, constants.FormattedRecordTypes[recordType], r.ShortDescription))
 	}
 
 	sb.WriteString("\n#### Records\n")
-	sb.WriteString("| Record ID | Record Type | Record Number | Record Short Description |\n| :----|:--------| :--------| :-----|")
+	sb.WriteString("| Record Number | Record ID| Record Type | Record Short Description |\n| :--------| :--------| :--------| :-----|")
 	sb.WriteString(recordsDetails.String())
 	return sb.String()
 }
