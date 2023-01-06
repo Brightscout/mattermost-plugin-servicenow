@@ -475,9 +475,9 @@ func getAutocompleteData() *model.AutocompleteData {
 	records.AddCommand(searchRecords)
 
 	viewRecords := model.NewAutocompleteData(constants.SubCommandView, "[record_type]", "View a ServiceNow record")
-	incidentRecord := model.NewAutocompleteData("incident", "", "Incident record type")
-	problemRecord := model.NewAutocompleteData("problem", "", "Problem record type")
-	changeRequestRecord := model.NewAutocompleteData("change_request", "", "Change Request record type")
+	incidentRecord := model.NewAutocompleteData(constants.RecordTypeIncident, "", "Incident record type")
+	problemRecord := model.NewAutocompleteData(constants.RecordTypeProblem, "", "Problem record type")
+	changeRequestRecord := model.NewAutocompleteData(constants.RecordTypeChangeRequest, "", "Change Request record type")
 	viewRecords.AddCommand(incidentRecord)
 	viewRecords.AddCommand(problemRecord)
 	viewRecords.AddCommand(changeRequestRecord)
