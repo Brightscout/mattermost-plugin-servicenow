@@ -23,8 +23,7 @@ const (
 	PathGetIncidentFields            = "/incident-fields"
 	PathCheckSubscriptionsConfigured = "/subscriptions-configured"
 	PathSearchFilterValues           = "/filter/{filter_type}"
-	PathGetFilteredRecords           = "/filtered-records/{record_type}"
-	PathShowRecord                   = "/show-record/{record_type}/{record_id:" + ServiceNowSysIDRegex + "}/{channel_id:[A-Za-z0-9]+}"
+	PathGetOpenTickets               = "/tickets/{record_type}"
 
 	// ServiceNow API paths
 	PathActivateSubscriptions             = "api/now/table/" + ServiceNowForMattermostNotificationsAppID + "_servicenow_for_mattermost_notifications_auth"
