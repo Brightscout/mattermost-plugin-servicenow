@@ -179,3 +179,8 @@ type FieldsFilterData = {
     sys_id: string;
     name: string;
 }
+
+type FilterType = {
+    searchFor: string;
+    filter: string;
+}

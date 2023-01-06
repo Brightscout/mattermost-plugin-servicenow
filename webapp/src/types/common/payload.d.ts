@@ -91,3 +91,18 @@ type SearchItemsParams = {
     search: string;
     perPage?: number;
 }
+
+type SearchFilterItemsParams = {
+    search: string;
+    filter: string;
+    perPage?: number;
+}
+
+type ListRecordsPayload = {
+    record_type: string;
+    search: string;
+    channel_id: string;
+    business_service?: string;
+    assignment_group?: string;
+    perPage?: number;
+}

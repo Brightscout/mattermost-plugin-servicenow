@@ -159,6 +159,22 @@ const pluginApi = createApi({
                 method: Constants.pluginApiServiceConfigs.getIncidentFeilds.method,
             }),
         }),
+        [Constants.pluginApiServiceConfigs.getFilterData.apiServiceName]: builder.query<IncidentFieldsData[], SearchFilterItemsParams>({
+            query: ({search, filter, perPage}) => ({
+                headers: {[Constants.HeaderCSRFToken]: Cookies.get(Constants.MMCSRF)},
+                url: `${Constants.pluginApiServiceConfigs.getFilterData.path}/${filter}`,
+                method: Constants.pluginApiServiceConfigs.getFilterData.method,
+                params: {search, perPage: perPage || Constants.DefaultPerPageParam},
+            }),
+        }),
+        [Constants.pluginApiServiceConfigs.listRecords.apiServiceName]: builder.query<IncidentFieldsData[], ListRecordsPayload>({
+            query: ({perPage, record_type, ...params}) => ({
+                headers: {[Constants.HeaderCSRFToken]: Cookies.get(Constants.MMCSRF)},
+                url: `${Constants.pluginApiServiceConfigs.listRecords.path}/${record_type}`,
+                method: Constants.pluginApiServiceConfigs.listRecords.method,
+                params: {...params, perPage: perPage || Constants.DefaultPerPageParam},
+            }),
+        }),
     }),
 });
 

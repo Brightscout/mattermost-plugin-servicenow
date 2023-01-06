@@ -1,6 +1,8 @@
 import {AutoSuggest, CustomModal as Modal, ModalFooter, ModalHeader} from '@brightscout/mattermost-ui-library';
 import React, {useCallback, useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+
+import {GlobalState} from 'mattermost-webapp/types/store';
 
 import usePluginApi from 'src/hooks/usePluginApi';
 import {resetGlobalModalState} from 'src/reducers/globalModal';
@@ -55,8 +57,9 @@ const ListRecords = () => {
     const [assignmentGroup, setAssignmentGroup] = useState<Record<string, string> | null>(null);
     const [service, setService] = useState<Record<string, string> | null>(null);
 
-    const {pluginState} = usePluginApi();
+    const {pluginState, makeApiRequestWithCompletionStatus} = usePluginApi();
     const dispatch = useDispatch();
+    const {currentChannelId} = useSelector((state: GlobalState) => state.entities.channels);
 
     const open = isFilterRecordsModalOpen(pluginState);
 
@@ -89,10 +92,9 @@ const ListRecords = () => {
         hideModal();
     };
 
-    const getSuggestions = ({searchFor}: {searchFor?: string}) => {
-        if (searchFor) {
-            // TODO: Make Api call later
-        }
+    const getSuggestions = ({filterType}: {filterType: FilterType}) => {
+        const {filter, searchFor} = filterType;
+        makeApiRequestWithCompletionStatus(Constants.pluginApiServiceConfigs.getFilterData.apiServiceName, {search: searchFor, filter});
     };
 
     const mapRequestsToSuggestions = (data: FieldsFilterData[]): Array<Record<string, string>> => data.map((d) => ({
@@ -106,7 +108,7 @@ const ListRecords = () => {
         setassignmentGroupAutoSuggestValue(currentValue);
         if (currentValue) {
             if (currentValue.length >= Constants.DefaultCharThresholdToShowSuggestions) {
-                debouncedGetSuggestions({searchFor: currentValue});
+                debouncedGetSuggestions({searchFor: currentValue, filter: 'assignment_group'});
             }
         }
     };
@@ -115,7 +117,7 @@ const ListRecords = () => {
         setServiceAutoSuggestValue(currentValue);
         if (currentValue) {
             if (currentValue.length >= Constants.DefaultCharThresholdToShowSuggestions) {
-                debouncedGetSuggestions({searchFor: currentValue});
+                debouncedGetSuggestions({searchFor: currentValue, filter: 'service'});
             }
         }
     };

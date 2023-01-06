@@ -424,6 +424,16 @@ const pluginApiServiceConfigs: Record<ApiServiceName, PluginApiService> = {
         method: 'GET',
         apiServiceName: 'getIncidentFeilds',
     },
+    getFilterData: {
+        path: '/filter',
+        method: 'GET',
+        apiServiceName: 'getFilterData',
+    },
+    listRecords: {
+        path: '/tickets',
+        method: 'GET',
+        apiServiceName: 'listRecords',
+    },
 };
 
 export const PanelDefaultHeights = {

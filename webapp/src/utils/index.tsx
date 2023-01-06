@@ -31,7 +31,7 @@ const getBaseUrls = (): {
  * @param {number} limit The time limit for debouncing, the minimum pause in function calls required for the function to be actually called
  * @returns {(args: Array<any>) => void} a function with debouncing functionality applied on it
  */
-const debounce: (func: (args: Record<string, string>) => void, limit: number) => (args: Record<string, string>) => void = (
+const debounce: (func: (args: Record<string, string | FilterType>) => void, limit: number) => (args: Record<string, string>) => void = (
     func: (args: Record<string, string>) => void,
     limit: number,
 ): (args: Record<string, string>) => void => {
