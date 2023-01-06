@@ -54,6 +54,7 @@ func (p *Plugin) InitAPI() *mux.Router {
 	s.HandleFunc(constants.PathCheckSubscriptionsConfigured, p.checkAuth(p.checkOAuth(p.checkSubscriptionsConfiguredAPI))).Methods(http.MethodGet)
 	s.HandleFunc(constants.PathGetIncidentFields, p.checkAuth(p.checkOAuth(p.getIncidentFields))).Methods(http.MethodGet)
 	s.HandleFunc(constants.PathSearchFilterValues, p.checkAuth(p.checkOAuth(p.searchFilterValuesInServiceNow))).Methods(http.MethodGet)
+	s.HandleFunc(constants.PathGetOpenTickets, p.checkAuth(p.checkOAuth(p.getRecordsFromServiceNow))).Methods(http.MethodGet)
 
 	// 404 handler
 	r.Handle("{anything:.*}", http.NotFoundHandler())
@@ -808,6 +809,48 @@ func (p *Plugin) searchFilterValuesInServiceNow(w http.ResponseWriter, r *http.R
 	}
 
 	p.writeJSONArray(w, statusCode, filterValues)
+}
+
+func (p *Plugin) getRecordsFromServiceNow(w http.ResponseWriter, r *http.Request) {
+	pathParams := mux.Vars(r)
+	userID := r.Header.Get(constants.HeaderMattermostUserID)
+	recordType := pathParams[constants.PathParamRecordType]
+	if !constants.ValidSubscriptionRecordTypes[recordType] {
+		p.API.LogError("Invalid record type while getting records", "RecordType", recordType)
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusBadRequest, Message: constants.ErrorInvalidRecordType})
+		return
+	}
+
+	channelID := r.URL.Query().Get(constants.QueryParamChannelID)
+	if channelID != "" && !model.IsValidId(channelID) {
+		p.API.LogError(constants.ErrorInvalidQueryParam, "QueryParam", constants.QueryParamChannelID)
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusBadRequest, Message: fmt.Sprintf("Query param %s is not valid", constants.QueryParamChannelID)})
+		return
+	}
+
+	permissionStatusCode, permissionErr := p.HasChannelPermissions(userID, channelID)
+	if permissionErr != nil {
+		p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: permissionStatusCode, Message: permissionErr.Error()})
+		return
+	}
+
+	assignmentGroupID := r.URL.Query().Get(constants.QueryParamAssignmentGroupID)
+	serviceID := r.URL.Query().Get(constants.QueryParamServiceID)
+	client := p.GetClientFromRequest(r)
+	records, statusCode, err := client.GetRecordsFromServiceNow(recordType, assignmentGroupID, serviceID)
+	if err != nil {
+		p.API.LogError(constants.ErrorGetRecords, "Error", err.Error())
+		_ = p.handleClientError(w, r, err, false, statusCode, "", fmt.Sprintf("%s. Error: %s", constants.ErrorGetRecords, err.Error()))
+		return
+	}
+
+	if len(records) == 0 {
+		p.Ephemeral(userID, channelID, "", "No record found")
+	} else {
+		p.Ephemeral(userID, channelID, "", ParseRecordsToCommandResponse(records, recordType, p.getConfiguration().ServiceNowBaseURL, channelID))
+	}
+
+	p.writeJSONArray(w, statusCode, records)
 }
 
 func returnStatusOK(w http.ResponseWriter) {

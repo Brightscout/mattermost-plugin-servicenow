@@ -33,6 +33,7 @@ type Client interface {
 	SearchCatalogItemsInServiceNow(searchTerm, limit, offset string) ([]*serializer.ServiceNowCatalogItem, int, error)
 	GetIncidentFieldsFromServiceNow() ([]*serializer.ServiceNowIncidentFields, int, error)
 	SearchFilterValuesInServiceNow(searchTerm, limit, offset, requestURL string) ([]*serializer.ServiceNowFilter, int, error)
+	GetRecordsFromServiceNow(recordType, assignmentGroupID, serviceID string) ([]*serializer.ServiceNowRecord, int, error)
 }
 
 type client struct {
@@ -328,4 +329,28 @@ func (c *client) SearchFilterValuesInServiceNow(searchTerm, limit, offset, reque
 	}
 
 	return assignmentGroups.Result, statusCode, nil
+}
+
+func (c *client) GetRecordsFromServiceNow(recordType, assignmentGroupID, serviceID string) ([]*serializer.ServiceNowRecord, int, error) {
+	query := "active=true"
+	if assignmentGroupID != "" {
+		query = fmt.Sprintf("%s^%s=%s", query, constants.QueryParamAssignmentGroupID, assignmentGroupID)
+	}
+
+	if serviceID != "" {
+		query = fmt.Sprintf("%s^%s=%s", query, constants.QueryParamServiceID, serviceID)
+	}
+
+	queryParams := url.Values{
+		constants.SysQueryParam: {query},
+	}
+
+	record := &serializer.ServiceNowRecordsResult{}
+	url := strings.Replace(constants.PathGetRecordsFromServiceNow, "{tableName}", recordType, 1)
+	_, statusCode, err := c.CallJSON(http.MethodGet, url, nil, record, queryParams)
+	if err != nil {
+		return nil, statusCode, err
+	}
+
+	return record.Result, statusCode, nil
 }

@@ -21,7 +21,7 @@ const (
 * |/servicenow connect| - Connect your Mattermost account to your ServiceNow account
 * |/servicenow disconnect| - Disconnect your Mattermost account from your ServiceNow account
 * |/servicenow subscriptions| - Manage your subscriptions to the record changes in ServiceNow
-* |/servicenow search| - Search a record in ServiceNow and share it in a channel
+* |/servicenow records| - Search a record in ServiceNow and share it in a channel
 * |/servicenow help| - Know about the features of this plugin
 `
 
@@ -75,7 +75,7 @@ func (p *Plugin) getCommand() (*model.Command, error) {
 	return &model.Command{
 		Trigger:              constants.CommandTrigger,
 		AutoComplete:         true,
-		AutoCompleteDesc:     fmt.Sprintf("Available commands: %s, %s, %s, %s, %s", constants.CommandConnect, constants.CommandDisconnect, constants.CommandSubscriptions, constants.CommandSearchAndShare, constants.CommandHelp),
+		AutoCompleteDesc:     fmt.Sprintf("Available commands: %s, %s, %s, %s, %s", constants.CommandConnect, constants.CommandDisconnect, constants.CommandSubscriptions, constants.CommandRecords, constants.CommandHelp),
 		AutoCompleteHint:     "[command]",
 		AutocompleteData:     getAutocompleteData(),
 		AutocompleteIconData: iconData,
@@ -132,15 +132,17 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		}
 
 		var client Client
-		if action != constants.CommandDisconnect && action != constants.CommandSearchAndShare && action != constants.CommandCreate {
+		if action != constants.CommandDisconnect && action != constants.CommandCreate {
 			if client = p.GetClientFromUser(args, user); client == nil {
 				return &model.CommandResponse{}, nil
 			}
 
-			if _, err := client.ActivateSubscriptions(); err != nil {
-				p.API.LogError("Unable to check or activate subscriptions in ServiceNow.", "Error", err.Error())
-				p.postCommandResponse(args, p.handleClientError(nil, nil, err, isSysAdmin, 0, args.UserId, ""))
-				return &model.CommandResponse{}, nil
+			if action == constants.CommandSubscriptions {
+				if _, err := client.ActivateSubscriptions(); err != nil {
+					p.API.LogError("Unable to check or activate subscriptions in ServiceNow.", "Error", err.Error())
+					p.postCommandResponse(args, p.handleClientError(nil, nil, err, isSysAdmin, 0, args.UserId, ""))
+					return &model.CommandResponse{}, nil
+				}
 			}
 		}
 
@@ -236,8 +238,64 @@ func (p *Plugin) handleCreate(args *model.CommandArgs, parameters []string, clie
 	}
 }
 
-func (p *Plugin) handleSearchAndShare(args *model.CommandArgs, params []string, client Client, _ bool) string {
-	return ""
+func (p *Plugin) handleRecords(args *model.CommandArgs, parameters []string, client Client, isSysAdmin bool) string {
+	if len(parameters) == 0 {
+		return "Invalid create command. Available commands are 'share' and 'view'."
+	}
+
+	command := parameters[0]
+	parameters = parameters[1:]
+	switch command {
+	case constants.SubCommandSearchAndShare:
+		return ""
+	case constants.SubCommandView:
+		return p.handleViewRecords(args, parameters, client)
+	default:
+		return fmt.Sprintf("Unknown subcommand %v", command)
+	}
+}
+
+func (p *Plugin) handleViewRecords(args *model.CommandArgs, params []string, client Client) string {
+	if len(params) < 2 {
+		return constants.ErrorCommandInvalidNumberOfParams
+	}
+
+	recordType := params[0]
+	sysID := params[1]
+	if !constants.ValidSubscriptionRecordTypes[recordType] {
+		return constants.ErrorInvalidRecordType
+	}
+
+	isValid, err := regexp.MatchString(constants.ServiceNowSysIDRegex, sysID)
+	if err != nil {
+		return genericErrorMessage
+	}
+
+	if !isValid {
+		return constants.ErrorInvalidServiceNowID
+	}
+
+	go func() {
+		record, _, err := client.GetRecordFromServiceNow(recordType, sysID)
+		if err != nil {
+			p.API.LogError(constants.ErrorGetRecord, "Error", err.Error())
+			p.postCommandResponse(args, constants.ErrorGeneric)
+			return
+		}
+
+		record.RecordType = recordType
+		if err := record.HandleNestedFields(p.getConfiguration().ServiceNowBaseURL); err != nil {
+			p.API.LogError(constants.ErrorHandlingNestedFields, "Error", err.Error())
+			p.postCommandResponse(args, constants.ErrorGeneric)
+			return
+		}
+
+		post := record.CreateSharingPost(args.ChannelId, p.botID, p.getConfiguration().ServiceNowBaseURL, p.GetPluginURL(), "")
+		post.Type = ""
+		_ = p.API.SendEphemeralPost(args.UserId, post)
+	}()
+
+	return genericWaitMessage
 }
 
 func (p *Plugin) handleListSubscriptions(args *model.CommandArgs, params []string, client Client, isSysAdmin bool) string {
@@ -378,7 +436,7 @@ func (p *Plugin) handleEditSubscription(params []string) string {
 }
 
 func getAutocompleteData() *model.AutocompleteData {
-	serviceNow := model.NewAutocompleteData(constants.CommandTrigger, "[command]", fmt.Sprintf("Available commands: %s, %s, %s, %s, %s, %s", constants.CommandConnect, constants.CommandDisconnect, constants.CommandSubscriptions, constants.CommandSearchAndShare, constants.CommandCreate, constants.CommandHelp))
+	serviceNow := model.NewAutocompleteData(constants.CommandTrigger, "[command]", fmt.Sprintf("Available commands: %s, %s, %s, %s, %s, %s", constants.CommandConnect, constants.CommandDisconnect, constants.CommandSubscriptions, constants.CommandRecords, constants.CommandCreate, constants.CommandHelp))
 
 	connect := model.NewAutocompleteData(constants.CommandConnect, "", "Connect your Mattermost account to your ServiceNow account")
 	serviceNow.AddCommand(connect)
@@ -411,8 +469,25 @@ func getAutocompleteData() *model.AutocompleteData {
 
 	serviceNow.AddCommand(subscriptions)
 
-	searchRecords := model.NewAutocompleteData(constants.CommandSearchAndShare, "", "Search and share a ServiceNow record")
-	serviceNow.AddCommand(searchRecords)
+	records := model.NewAutocompleteData(constants.CommandRecords, "[command]", fmt.Sprintf("Available commands: %s, %s", constants.SubCommandSearchAndShare, constants.SubCommandView))
+
+	searchRecords := model.NewAutocompleteData(constants.SubCommandSearchAndShare, "", "Search and share a ServiceNow record")
+	records.AddCommand(searchRecords)
+
+	viewRecords := model.NewAutocompleteData(constants.SubCommandView, "[record_type]", "View a ServiceNow record")
+	incidentRecord := model.NewAutocompleteData(constants.RecordTypeIncident, "", "Incident record type")
+	problemRecord := model.NewAutocompleteData(constants.RecordTypeProblem, "", "Problem record type")
+	changeRequestRecord := model.NewAutocompleteData(constants.RecordTypeChangeRequest, "", "Change Request record type")
+	viewRecords.AddCommand(incidentRecord)
+	viewRecords.AddCommand(problemRecord)
+	viewRecords.AddCommand(changeRequestRecord)
+
+	incidentRecord.AddTextArgument("Record number", "[record_number]", "")
+	problemRecord.AddTextArgument("Record number", "[record_number]", "")
+	changeRequestRecord.AddTextArgument("Record number", "[record_number]", "")
+	records.AddCommand(viewRecords)
+
+	serviceNow.AddCommand(records)
 
 	create := model.NewAutocompleteData(constants.CommandCreate, "[command]", fmt.Sprintf("Available commands: %s, %s", constants.SubCommandIncident, constants.SubCommandRequest))
 	createIncident := model.NewAutocompleteData("incident", "", "Create an incident")

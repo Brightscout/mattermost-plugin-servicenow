@@ -23,6 +23,7 @@ const (
 	PathGetIncidentFields            = "/incident-fields"
 	PathCheckSubscriptionsConfigured = "/subscriptions-configured"
 	PathSearchFilterValues           = "/filter/{filter_type}"
+	PathGetOpenTickets               = "/tickets/{record_type}"
 
 	// ServiceNow API paths
 	PathActivateSubscriptions             = "api/now/table/" + ServiceNowForMattermostNotificationsAppID + "_servicenow_for_mattermost_notifications_auth"
@@ -41,4 +42,5 @@ const (
 	PathSysUserGroup  = "/sys_user_group.do?sys_id=%s"
 	PathKnowledgeBase = PathServiceNowURL + "/kb_knowledge_base.do%%3Fsys_id=%s"
 	PathCategory      = PathServiceNowURL + "/kb_category.do%%3Fsys_id=%s"
+	PathService       = PathServiceNowURL + "/cmdb_ci_service.do%%3Fsys_id=%s"
 )

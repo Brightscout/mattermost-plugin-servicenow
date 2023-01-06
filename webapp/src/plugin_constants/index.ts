@@ -167,6 +167,7 @@ export enum RecordDataConfigLabels {
     PRIORITY = 'Priority',
     ASSIGNED_TO = 'Assigned To',
     ASSIGNMENT_GROUP = 'Assignment Group',
+    SERVICE = 'Service',
 }
 
 // Used in search records panel for rendering the key-value pairs of the record for showing the record details
@@ -315,6 +316,7 @@ export const KeysContainingLink = new Set([
     KnowledgeRecordDataConfigLabels.CATEGORY,
     RecordDataConfigLabels.ASSIGNED_TO,
     RecordDataConfigLabels.ASSIGNMENT_GROUP,
+    RecordDataConfigLabels.SERVICE,
 ]);
 
 export type TypesContainingLink = KnowledgeRecordDataConfigKeys | RecordDataConfigKeys | KnowledgeRecordDataConfigLabels | RecordDataConfigLabels;
