@@ -240,13 +240,13 @@ func (p *Plugin) handleCreate(args *model.CommandArgs, parameters []string, clie
 
 func (p *Plugin) handleRecords(args *model.CommandArgs, parameters []string, client Client, isSysAdmin bool) string {
 	if len(parameters) == 0 {
-		return "Invalid create command. Available commands are 'share' and 'view'."
+		return "Invalid record command. Available commands are 'share', 'list' and 'view'."
 	}
 
 	command := parameters[0]
 	parameters = parameters[1:]
 	switch command {
-	case constants.SubCommandSearchAndShare:
+	case constants.SubCommandSearchAndShare, constants.SubCommandList:
 		return ""
 	case constants.SubCommandView:
 		return p.handleViewRecords(args, parameters, client)
@@ -486,6 +486,9 @@ func getAutocompleteData() *model.AutocompleteData {
 	problemRecord.AddTextArgument("Record number", "[record_number]", "")
 	changeRequestRecord.AddTextArgument("Record number", "[record_number]", "")
 	records.AddCommand(viewRecords)
+
+	listRecords := model.NewAutocompleteData(constants.SubCommandList, "", "List ServiceNow records")
+	records.AddCommand(listRecords)
 
 	serviceNow.AddCommand(records)
 

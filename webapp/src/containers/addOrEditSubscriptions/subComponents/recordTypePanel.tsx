@@ -13,7 +13,7 @@ type RecordTypePanelProps = {
     requiredFieldValidationErr?: boolean;
     recordType: RecordType | null;
     setRecordType: (value: RecordType) => void;
-    setResetRecordPanelStates: (reset: boolean) => void;
+    setResetRecordPanelStates?: (reset: boolean) => void;
     showFooter?: boolean;
     placeholder?: string;
     recordTypeOptions: DropdownOptionType[];
@@ -56,7 +56,9 @@ const RecordTypePanel = forwardRef<HTMLDivElement, RecordTypePanelProps>(({
     // Handle change in record type
     const handleRecordTypeChange = (newValue: RecordType) => {
         setRecordType(newValue);
-        setResetRecordPanelStates(true);
+        if (setResetRecordPanelStates) {
+            setResetRecordPanelStates(true);
+        }
     };
 
     return (

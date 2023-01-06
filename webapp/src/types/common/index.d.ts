@@ -174,3 +174,8 @@ type FormatTextOptions = {
 type MessageHtmlToComponentOptions = {
     mentionHighlight: boolean;
 }
+
+type FieldsFilterData = {
+    sys_id: string;
+    name: string;
+}

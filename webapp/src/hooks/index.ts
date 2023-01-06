@@ -65,6 +65,14 @@ export default class Hooks {
             };
         }
 
+        if (commandTrimmed?.startsWith('/servicenow records list')) {
+            this.store.dispatch(setGlobalModalState({modalId: ModalIds.LIST_RECORDS}) as Action);
+            return {
+                message,
+                args: contextArgs,
+            };
+        }
+
         return Promise.resolve({
             message,
             args: contextArgs,

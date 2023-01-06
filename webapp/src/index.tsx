@@ -18,6 +18,7 @@ import NotificationPost from 'src/containers/custom_post/notificationPost';
 import ShareRecordPost from 'src/containers/custom_post/shareRecordPost';
 import CreateRequest from 'src/containers/createRequest';
 import CreateIncidentPostMenuAction from 'src/containers/createIncident/createIncidentMenu';
+import ListRecords from 'src/containers/listRecords';
 import ShareRecords from 'src/containers/shareRecords';
 import UpdateState from 'src/containers/updateState';
 
@@ -46,6 +47,7 @@ export default class Plugin {
         registry.registerRootComponent(ShareRecords);
         registry.registerRootComponent(UpdateState);
         registry.registerRootComponent(CreateRequest);
+        registry.registerRootComponent(ListRecords);
         registry.registerRootComponent(App);
         const {id, toggleRHSPlugin} = registry.registerRightHandSidebarComponent(Rhs, Constants.RightSidebarHeader);
         registry.registerChannelHeaderButtonAction(<ServiceNowIcon className='servicenow-icon'/>, () => store.dispatch(toggleRHSPlugin), null, Constants.ChannelHeaderTooltipText);
