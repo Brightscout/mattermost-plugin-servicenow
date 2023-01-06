@@ -60,6 +60,7 @@ export enum ModalIds {
     UPDATE_STATE = 'updateState',
     CREATE_INCIDENT = 'createIncident',
     CREATE_REQUEST = 'createRequest',
+    LIST_RECORDS = 'listRecords',
 }
 
 export enum SubscriptionEvents {

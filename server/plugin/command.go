@@ -236,6 +236,19 @@ func (p *Plugin) handleCreate(args *model.CommandArgs, parameters []string, clie
 	}
 }
 
+func (p *Plugin) handleShow(args *model.CommandArgs, parameters []string, client Client, isSysAdmin bool) string {
+	if len(parameters) == 0 {
+		return "Invalid show command. Available command is 'records'"
+	}
+
+	command := parameters[0]
+	if command == constants.SubCommandRecords {
+		return ""
+	} else {
+		return fmt.Sprintf("Unknown subcommand %v", command)
+	}
+}
+
 func (p *Plugin) handleSearchAndShare(args *model.CommandArgs, params []string, client Client, _ bool) string {
 	return ""
 }
@@ -420,6 +433,11 @@ func getAutocompleteData() *model.AutocompleteData {
 	createRequest := model.NewAutocompleteData("request", "", "Create a request")
 	create.AddCommand(createRequest)
 	serviceNow.AddCommand(create)
+
+	show := model.NewAutocompleteData(constants.CommandShow, "[command]", fmt.Sprintf("Available command: %s", constants.SubCommandRecords))
+	showRecords := model.NewAutocompleteData("records", "", "Show filtered records")
+	show.AddCommand(showRecords)
+	serviceNow.AddCommand(show)
 
 	help := model.NewAutocompleteData(constants.CommandHelp, "", "Display slash command help text")
 	serviceNow.AddCommand(help)

@@ -17,3 +17,5 @@ export const isCreateIncidentModalOpen = (state: PluginState): boolean => state.
 export const isCreateRequestModalOpen = (state: PluginState): boolean => state.globalModalReducer.modalId === ModalIds.CREATE_REQUEST;
 
 export const getApiRequestCompletionState = (state: PluginState): ApiRequestCompletionState => state.apiRequestCompletionReducer;
+
+export const isFilterRecordsModalOpen = (state: PluginState): boolean => state.globalModalReducer.modalId === ModalIds.LIST_RECORDS;

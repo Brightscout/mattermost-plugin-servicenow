@@ -39,6 +39,7 @@ func NewPlugin() *Plugin {
 		constants.CommandUnsubscribe:    p.handleDeleteSubscription,
 		constants.CommandSearchAndShare: p.handleSearchAndShare,
 		constants.CommandCreate:         p.handleCreate,
+		constants.CommandShow: p.handleShow,
 	}
 
 	return p

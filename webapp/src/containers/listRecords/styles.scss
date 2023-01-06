@@ -1,0 +1,14 @@
+.servicenow-list-records-modal {
+    &__auto-suggest {
+        .auto-suggest {
+            left: 12px;
+            width: 573px;
+        }
+    }
+
+    &__suggestion-chosen {
+        .auto-suggest__selected-option-container {
+            padding-left: 15px !important;
+        }
+    }
+}
