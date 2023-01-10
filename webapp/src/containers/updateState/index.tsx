@@ -83,6 +83,7 @@ const UpdateState = () => {
             if (error.id === Constants.ApiErrorIdNotConnected || error.id === Constants.ApiErrorIdRefreshTokenExpired) {
                 dispatch(setConnected(false));
             }
+
             setApiError(error);
             setShowResultPanel(true);
         }
@@ -99,6 +100,7 @@ const UpdateState = () => {
             if (error.id === Constants.ApiErrorIdNotConnected || error.id === Constants.ApiErrorIdRefreshTokenExpired) {
                 dispatch(setConnected(false));
             }
+
             setApiError(error);
             setShowResultPanel(true);
         }
@@ -114,6 +116,7 @@ const UpdateState = () => {
             if (error.id === Constants.ApiErrorIdNotConnected || error.id === Constants.ApiErrorIdRefreshTokenExpired) {
                 dispatch(setConnected(false));
             }
+
             setApiError(error);
             setShowResultPanel(true);
         }
