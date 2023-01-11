@@ -220,6 +220,34 @@ func TestCompleteOAuth2(t *testing.T) {
 			},
 			expectedErrorMessage: "failed to get ServiceNow user",
 		},
+		"user doesn't exist on ServiceNow": {
+			authenticatedUserID: mockUserID,
+			code:                mockCode,
+			state:               mockState,
+			setupStore: func(s *mock_plugin.Store) {
+				s.On("VerifyOAuth2State", mockState).Return(nil)
+			},
+			setupAPI: func(a *plugintest.API) {
+				a.On("GetUser", mockUserID).Return(&model.User{}, nil)
+			},
+			setupPlugin: func(p *Plugin) {
+				monkey.PatchInstanceMethod(reflect.TypeOf(&oauth2.Config{}), "Exchange", func(_ *oauth2.Config, _ context.Context, _ string, _ ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
+					return &oauth2.Token{}, nil
+				})
+				monkey.PatchInstanceMethod(reflect.TypeOf(p), "NewEncodedAuthToken", func(_ *Plugin, _ *oauth2.Token) (string, error) {
+					return "mockToken", nil
+				})
+				monkey.PatchInstanceMethod(reflect.TypeOf(p), "NewClient", func(_ *Plugin, _ context.Context, _ *oauth2.Token) Client {
+					return &mock_plugin.Client{}
+				})
+				monkey.PatchInstanceMethod(reflect.TypeOf(client), "GetMe", func(_ *mock_plugin.Client, _ string) (*serializer.ServiceNowUser, int, error) {
+					return nil, http.StatusInternalServerError, errors.New("user doesn't exist")
+				})
+				monkey.PatchInstanceMethod(reflect.TypeOf(p), "DM", func(_ *Plugin, _, _ string, _ ...interface{}) (string, error) {
+					return "", nil
+				})
+			},
+		},
 		"failed to store user": {
 			authenticatedUserID: mockUserID,
 			code:                mockCode,

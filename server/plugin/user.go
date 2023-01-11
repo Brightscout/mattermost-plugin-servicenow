@@ -62,6 +62,10 @@ func (p *Plugin) CompleteOAuth2(authedUserID, code, state string) error {
 	client := p.NewClient(ctx, token)
 	serviceNowUser, _, err := client.GetMe(user.Email)
 	if err != nil {
+		if strings.Contains(err.Error(), "user doesn't exist") {
+			_, _ = p.DM(mattermostUserID, constants.EmailAbsentInServiceNowMessage, user.Email)
+			return nil
+		}
 		return err
 	}
 

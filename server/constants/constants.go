@@ -11,10 +11,11 @@ const (
 
 	ConnectSuccessMessage = "#### Welcome to the Mattermost ServiceNow Plugin\n" +
 		"You've successfully connected your Mattermost account `%s` to ServiceNow. Read about the features of this plugin below:\n\n"
-	UserAlreadyConnectedMessage = "You are already connected to ServiceNow."
-	UserConnectMessage          = "Click here to link your ServiceNow account."
-	InvalidConfigUserMessage    = "Please contact your system administrator to correctly configure the ServiceNow plugin."
-	InvalidConfigAdminMessage   = "Before using this plugin, you'll need to configure it in the System Console`"
+	EmailAbsentInServiceNowMessage = "The ServiceNow account that you're connecting with should have the same email that you use on Mattermost and there is no user with email %s present on ServiceNow."
+	UserAlreadyConnectedMessage    = "You are already connected to ServiceNow."
+	UserConnectMessage             = "Click here to link your ServiceNow account."
+	InvalidConfigUserMessage       = "Please contact your system administrator to correctly configure the ServiceNow plugin."
+	InvalidConfigAdminMessage      = "Before using this plugin, you'll need to configure it in the System Console`"
 
 	ServiceNowForMattermostNotificationsAppID = "x_830655_mm_std"
 	ServiceNowSysIDRegex                      = "[0-9a-f]{32}"
