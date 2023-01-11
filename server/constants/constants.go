@@ -11,7 +11,7 @@ const (
 
 	ConnectSuccessMessage = "#### Welcome to the Mattermost ServiceNow Plugin\n" +
 		"You've successfully connected your Mattermost account `%s` to ServiceNow. Read about the features of this plugin below:\n\n"
-	EmailAbsentInServiceNowMessage = "The ServiceNow account that you're connecting with should have the same email that you use on Mattermost and there is no user with email %s present on ServiceNow."
+	EmailAbsentInServiceNowMessage = "We were unable to find a ServiceNow account for %s. To connect to ServiceNow,  your ServiceNow email address must match your Mattermost email address."
 	UserAlreadyConnectedMessage    = "You are already connected to ServiceNow."
 	UserConnectMessage             = "Click here to link your ServiceNow account."
 	InvalidConfigUserMessage       = "Please contact your system administrator to correctly configure the ServiceNow plugin."
