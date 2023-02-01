@@ -42,7 +42,7 @@ const CommentsHeading = 'Comments';
 const NoCommentsPresent = 'No more comments present.';
 const CommentsNotFound = 'No comments found.';
 const EmptyFieldsInServiceNow = 'N/A';
-const ReconnectMessage = "Please disconnect your account and then reconnect again."
+const ReconnectMessage = 'Please disconnect your account and then reconnect again.';
 
 export enum SubscriptionEvents {
     CREATED = 'created',

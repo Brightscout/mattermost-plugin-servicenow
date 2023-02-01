@@ -175,7 +175,7 @@ func (p *Plugin) GetClientFromUser(args *model.CommandArgs, user *serializer.Use
 	if err != nil {
 		p.API.LogError("Unable to parse oauth token", "Error", err.Error())
 		if err.Error() == constants.ErrorMessageAuthenticationFailed {
-			p.postCommandResponse(args, fmt.Sprintf("%s\n%s", genericErrorMessage, constants.ReconnectMessage))
+			p.postCommandResponse(args, fmt.Sprintf("%s %s", genericErrorMessage, constants.ReconnectMessage))
 		} else {
 			p.postCommandResponse(args, genericErrorMessage)
 		}
