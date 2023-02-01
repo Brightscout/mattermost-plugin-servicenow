@@ -103,11 +103,13 @@ const RhsData = ({
         );
     }, [getConfigState().data?.ServiceNowBaseURL]);
 
+    const errorTitle = (error && error === (Constants.GeneralErrorMessage+"\n"+Constants.ReconnectMessage)) ? error : "";
+
     return (
         <>
             {error && (
                 <EmptyState
-                    title={Constants.GeneralErrorMessage}
+                    title={(errorTitle === "") ? Constants.GeneralErrorMessage : errorTitle}
                     subTitle={isCurrentUserSysAdmin ? Constants.GeneralErrorSubtitleForAdmin : Constants.GeneralErrorSubtitleForUser}
                     iconClass='fa fa-exclamation-triangle err-icon'
                     className='error-state'

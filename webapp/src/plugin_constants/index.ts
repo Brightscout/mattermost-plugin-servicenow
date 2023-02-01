@@ -26,7 +26,7 @@ const ApiErrorIdNotConnected = 'not_connected';
 const ApiErrorIdRefreshTokenExpired = 'refresh_token_expired';
 const ApiErrorIdSubscriptionsNotConfigured = 'subscriptions_not_configured';
 const ApiErrorIdSubscriptionsUnauthorized = 'subscriptions_not_authorized';
-const GeneralErrorMessage = 'Something went wrong';
+const GeneralErrorMessage = 'Something went wrong.';
 const GeneralErrorSubtitleForUser = 'Please contact your system administrator.';
 const GeneralErrorSubtitleForAdmin = 'Please check the server logs.';
 const SubscriptionAddedMsg = 'Subscription added successfully!';
@@ -42,6 +42,7 @@ const CommentsHeading = 'Comments';
 const NoCommentsPresent = 'No more comments present.';
 const CommentsNotFound = 'No comments found.';
 const EmptyFieldsInServiceNow = 'N/A';
+const ReconnectMessage = "Please disconnect your account and then reconnect again."
 
 export enum SubscriptionEvents {
     CREATED = 'created',
@@ -349,4 +350,5 @@ export default {
     DefaultSubscriptionFilters,
     SubscriptionFilterCreatedByOptions,
     EmptyFieldsInServiceNow,
+    ReconnectMessage,
 };

@@ -15,6 +15,7 @@ const (
 	UserConnectMessage          = "Click here to link your ServiceNow account."
 	InvalidConfigUserMessage    = "Please contact your system administrator to correctly configure the ServiceNow plugin."
 	InvalidConfigAdminMessage   = "Before using this plugin, you'll need to configure it in the System Console`"
+	ReconnectMessage            = "Please disconnect your account and then reconnect again."
 
 	ServiceNowForMattermostNotificationsAppID = "x_830655_mm_std"
 	ServiceNowSysIDRegex                      = "[0-9a-f]{32}"
@@ -170,6 +171,7 @@ const (
 	ErrorChannelPermissionsForUser        = "unable to get the channel permissions for a user"
 	ErrorNoActiveSubscriptions            = "You don't have any active subscriptions."
 	ErrorInvalidChannelType               = "invalid channel type for performing action"
+	ErrorMessageAuthenticationFailed      = "cipher: message authentication failed"
 )
 
 // kv store keys prefix
