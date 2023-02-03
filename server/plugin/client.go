@@ -259,7 +259,7 @@ func (c *client) GetMe(userEmail string) (*serializer.ServiceNowUser, int, error
 	}
 
 	if len(userList.UserDetails) == 0 {
-		return nil, statusCode, fmt.Errorf("Please make sure your email address on your Mattermost account matches the email in your ServiceNow account.")
+		return nil, statusCode, fmt.Errorf("please make sure your email address on your Mattermost account matches the email in your ServiceNow account")
 	}
 
 	if len(userList.UserDetails) > 1 {
