@@ -137,7 +137,7 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 				return &model.CommandResponse{}, nil
 			}
 
-			if action != constants.CommandSearchAndShare {
+			if action == constants.CommandSubscriptions {
 				if _, err := client.ActivateSubscriptions(); err != nil {
 					p.API.LogError("Unable to check or activate subscriptions in ServiceNow.", "Error", err.Error())
 					p.postCommandResponse(args, p.handleClientError(nil, nil, err, isSysAdmin, 0, args.UserId, ""))

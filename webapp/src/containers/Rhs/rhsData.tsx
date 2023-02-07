@@ -107,7 +107,7 @@ const RhsData = ({
         <>
             {error && (
                 <EmptyState
-                    title={error.includes(Constants.GeneralErrorMessage + '\n' + Constants.ReconnectMessage) ? error : Constants.GeneralErrorMessage}
+                    title={error.includes(Constants.ReconnectMessage) ? error : Constants.GeneralErrorMessage}
                     subTitle={isCurrentUserSysAdmin ? Constants.GeneralErrorSubtitleForAdmin : Constants.GeneralErrorSubtitleForUser}
                     iconClass='fa fa-exclamation-triangle err-icon'
                     className='error-state'
