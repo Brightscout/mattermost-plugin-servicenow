@@ -132,17 +132,15 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		}
 
 		var client Client
-		if action != constants.CommandDisconnect {
+		if action != constants.CommandDisconnect && action != constants.CommandSearchAndShare {
 			if client = p.GetClientFromUser(args, user); client == nil {
 				return &model.CommandResponse{}, nil
 			}
 
-			if action == constants.CommandSubscriptions {
-				if _, err := client.ActivateSubscriptions(); err != nil {
-					p.API.LogError("Unable to check or activate subscriptions in ServiceNow.", "Error", err.Error())
-					p.postCommandResponse(args, p.handleClientError(nil, nil, err, isSysAdmin, 0, args.UserId, ""))
-					return &model.CommandResponse{}, nil
-				}
+			if _, err := client.ActivateSubscriptions(); err != nil {
+				p.API.LogError("Unable to check or activate subscriptions in ServiceNow.", "Error", err.Error())
+				p.postCommandResponse(args, p.handleClientError(nil, nil, err, isSysAdmin, 0, args.UserId, ""))
+				return &model.CommandResponse{}, nil
 			}
 		}
 
@@ -176,11 +174,7 @@ func (p *Plugin) GetClientFromUser(args *model.CommandArgs, user *serializer.Use
 	token, err := p.ParseAuthToken(user.OAuth2Token)
 	if err != nil {
 		p.API.LogError("Unable to parse oauth token", "Error", err.Error())
-		if err.Error() == constants.ErrorMessageAuthenticationFailed {
-			p.postCommandResponse(args, fmt.Sprintf("%s\n%s", genericErrorMessage, constants.ReconnectMessage))
-		} else {
-			p.postCommandResponse(args, genericErrorMessage)
-		}
+		p.postCommandResponse(args, genericErrorMessage)
 		return nil
 	}
 

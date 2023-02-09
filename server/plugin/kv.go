@@ -28,6 +28,7 @@ type UserStore interface {
 	StoreUser(user *serializer.User) error
 	DeleteUser(mattermostUserID string) error
 	GetAllUsers() ([]*serializer.IncidentCaller, error)
+	DeleteUserTokenOnEncryptionSecretChange() error
 }
 
 // OAuth2StateStore manages OAuth2 state
@@ -122,6 +123,41 @@ func (s *pluginStore) GetAllUsers() ([]*serializer.IncidentCaller, error) {
 	}
 
 	return users, nil
+}
+
+func (s *pluginStore) DeleteUserTokenOnEncryptionSecretChange() error {
+	page := 0
+	for {
+		kvList, err := s.plugin.API.KVList(page, constants.DefaultPerPage)
+		if err != nil {
+			return err
+		}
+		if len(kvList) == 0 {
+			return nil
+		}
+
+		for _, key := range kvList {
+			if userID, isValidUserKey := IsValidUserKey(key); isValidUserKey {
+				decodedKey, decodeErr := decodeKey(userID)
+				if decodeErr != nil {
+					s.plugin.API.LogError("Unable to decode key", "UserID", userID, "Error", decodeErr.Error())
+					continue
+				}
+
+				user, loadErr := s.LoadUser(decodedKey)
+				if loadErr != nil {
+					s.plugin.API.LogError("Unable to load user", "UserID", userID, "Error", loadErr.Error())
+					continue
+				}
+
+				if err := s.DeleteUser(user.MattermostUserID); err != nil {
+					return err
+				}
+			}
+		}
+
+		page++
+	}
 }
 
 func (s *pluginStore) VerifyOAuth2State(state string) error {

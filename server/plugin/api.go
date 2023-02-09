@@ -88,11 +88,7 @@ func (p *Plugin) checkOAuth(handler http.HandlerFunc) http.HandlerFunc {
 		token, err := p.ParseAuthToken(user.OAuth2Token)
 		if err != nil {
 			p.API.LogError("Unable to parse oauth token", "Error", err.Error())
-			if err.Error() == constants.ErrorMessageAuthenticationFailed {
-				p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusInternalServerError, Message: fmt.Sprintf("%s\n%s", constants.ErrorGeneric, constants.ReconnectMessage)})
-			} else {
-				p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusInternalServerError, Message: fmt.Sprintf("%s Error: %s", constants.ErrorGeneric, err.Error())})
-			}
+			p.handleAPIError(w, &serializer.APIErrorResponse{StatusCode: http.StatusInternalServerError, Message: fmt.Sprintf("%s Error: %s", constants.ErrorGeneric, err.Error())})
 			return
 		}
 
