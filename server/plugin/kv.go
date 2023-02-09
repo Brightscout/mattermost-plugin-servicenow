@@ -132,9 +132,6 @@ func (s *pluginStore) DeleteUserTokenOnEncryptionSecretChange() error {
 		if err != nil {
 			return err
 		}
-		if len(kvList) == 0 {
-			return nil
-		}
 
 		for _, key := range kvList {
 			if userID, isValidUserKey := IsValidUserKey(key); isValidUserKey {
@@ -144,20 +141,20 @@ func (s *pluginStore) DeleteUserTokenOnEncryptionSecretChange() error {
 					continue
 				}
 
-				user, loadErr := s.LoadUser(decodedKey)
-				if loadErr != nil {
-					s.plugin.API.LogError("Unable to load user", "UserID", userID, "Error", loadErr.Error())
-					continue
-				}
-
-				if err := s.DeleteUser(user.MattermostUserID); err != nil {
+				if err := s.DeleteUser(decodedKey); err != nil {
 					return err
 				}
 			}
 		}
 
+		if len(kvList) < constants.DefaultPerPage {
+			break
+		}
+
 		page++
 	}
+
+	return nil
 }
 
 func (s *pluginStore) VerifyOAuth2State(state string) error {
