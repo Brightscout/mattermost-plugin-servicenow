@@ -126,32 +126,16 @@ func (s *pluginStore) GetAllUsers() ([]*serializer.IncidentCaller, error) {
 }
 
 func (s *pluginStore) DeleteUserTokenOnEncryptionSecretChange() error {
-	page := 0
-	for {
-		kvList, err := s.plugin.API.KVList(page, constants.DefaultPerPage)
-		if err != nil {
-			return err
+	users, err := s.GetAllUsers()
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
+		if err := s.DeleteUser(user.MattermostUserID); err != nil {
+			s.plugin.API.LogError("Unable to delete a user", "UserID", user.MattermostUserID, "Error", err.Error())
+			continue
 		}
-
-		for _, key := range kvList {
-			if userID, isValidUserKey := IsValidUserKey(key); isValidUserKey {
-				decodedKey, decodeErr := decodeKey(userID)
-				if decodeErr != nil {
-					s.plugin.API.LogError("Unable to decode key", "UserID", userID, "Error", decodeErr.Error())
-					continue
-				}
-
-				if err := s.DeleteUser(decodedKey); err != nil {
-					return err
-				}
-			}
-		}
-
-		if len(kvList) < constants.DefaultPerPage {
-			break
-		}
-
-		page++
 	}
 
 	return nil
