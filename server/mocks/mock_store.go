@@ -31,18 +31,9 @@ func (_m *Store) DeleteUser(mattermostUserID string) error {
 	return r0
 }
 
-// DeleteUserTokenOnEncryptionSecretChange provides a mock function with given fields:
-func (_m *Store) DeleteUserTokenOnEncryptionSecretChange() error {
-	ret := _m.Called()
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func() error); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
+// DeleteUserTokenOnEncryptionSecretChange provides a mock function with given fields: ch
+func (_m *Store) DeleteUserTokenOnEncryptionSecretChange(ch chan error) {
+	_m.Called(ch)
 }
 
 // GetAllUsers provides a mock function with given fields:

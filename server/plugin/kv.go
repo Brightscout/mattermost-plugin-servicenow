@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"sync"
 	"time"
 
 	"github.com/mattermost/mattermost-server/v5/plugin"
@@ -28,7 +29,7 @@ type UserStore interface {
 	StoreUser(user *serializer.User) error
 	DeleteUser(mattermostUserID string) error
 	GetAllUsers() ([]*serializer.IncidentCaller, error)
-	DeleteUserTokenOnEncryptionSecretChange() error
+	DeleteUserTokenOnEncryptionSecretChange(ch chan error)
 }
 
 // OAuth2StateStore manages OAuth2 state
@@ -87,33 +88,40 @@ func (s *pluginStore) DeleteUser(mattermostUserID string) error {
 func (s *pluginStore) GetAllUsers() ([]*serializer.IncidentCaller, error) {
 	page := 0
 	users := []*serializer.IncidentCaller{}
+	wg := new(sync.WaitGroup)
 	for {
 		kvList, err := s.plugin.API.KVList(page, constants.DefaultPerPage)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, key := range kvList {
-			if userID, isValidUserKey := IsValidUserKey(key); isValidUserKey {
-				decodedKey, decodeErr := decodeKey(userID)
-				if decodeErr != nil {
-					s.plugin.API.LogError("Unable to decode key", "UserID", userID, "Error", decodeErr.Error())
-					continue
-				}
+		wg.Add(1)
+		go func(kvList []string) {
+			defer wg.Done()
+			for _, key := range kvList {
+				if userID, isValidUserKey := IsValidUserKey(key); isValidUserKey {
+					decodedKey, decodeErr := decodeKey(userID)
+					if decodeErr != nil {
+						s.plugin.API.LogError("Unable to decode key", "UserID", userID, "Error", decodeErr.Error())
+						continue
+					}
 
-				user, loadErr := s.LoadUser(decodedKey)
-				if loadErr != nil {
-					s.plugin.API.LogError("Unable to load user", "UserID", userID, "Error", loadErr.Error())
-					continue
-				}
+					user, loadErr := s.LoadUser(decodedKey)
+					if loadErr != nil {
+						s.plugin.API.LogError("Unable to load user", "UserID", userID, "Error", loadErr.Error())
+						continue
+					}
 
-				users = append(users, &serializer.IncidentCaller{
-					MattermostUserID: user.MattermostUserID,
-					Username:         user.Username,
-					ServiceNowUser:   user.ServiceNowUser,
-				})
+					users = append(users, &serializer.IncidentCaller{
+						MattermostUserID: user.MattermostUserID,
+						Username:         user.Username,
+						ServiceNowUser:   user.ServiceNowUser,
+					})
+				}
 			}
-		}
+		}(kvList)
+
+		wg.Wait()
 
 		if len(kvList) < constants.DefaultPerPage {
 			break
@@ -125,10 +133,11 @@ func (s *pluginStore) GetAllUsers() ([]*serializer.IncidentCaller, error) {
 	return users, nil
 }
 
-func (s *pluginStore) DeleteUserTokenOnEncryptionSecretChange() error {
+func (s *pluginStore) DeleteUserTokenOnEncryptionSecretChange(ch chan error) {
 	users, err := s.GetAllUsers()
 	if err != nil {
-		return err
+		ch <- err
+		return
 	}
 
 	for _, user := range users {
@@ -137,8 +146,6 @@ func (s *pluginStore) DeleteUserTokenOnEncryptionSecretChange() error {
 			continue
 		}
 	}
-
-	return nil
 }
 
 func (s *pluginStore) VerifyOAuth2State(state string) error {
