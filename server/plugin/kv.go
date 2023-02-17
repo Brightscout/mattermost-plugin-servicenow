@@ -29,7 +29,7 @@ type UserStore interface {
 	StoreUser(user *serializer.User) error
 	DeleteUser(mattermostUserID string) error
 	GetAllUsers() ([]*serializer.IncidentCaller, error)
-	DeleteUserTokenOnEncryptionSecretChange(ch chan error)
+	DeleteUserTokenOnEncryptionSecretChange()
 }
 
 // OAuth2StateStore manages OAuth2 state
@@ -89,38 +89,45 @@ func (s *pluginStore) GetAllUsers() ([]*serializer.IncidentCaller, error) {
 	page := 0
 	users := []*serializer.IncidentCaller{}
 	wg := new(sync.WaitGroup)
+	mu := new(sync.Mutex)
 	for {
 		kvList, err := s.plugin.API.KVList(page, constants.DefaultPerPage)
 		if err != nil {
 			return nil, err
 		}
 
-		wg.Add(1)
-		go func(kvList []string) {
-			defer wg.Done()
-			for _, key := range kvList {
+		for _, key := range kvList {
+			wg.Add(1)
+
+			go func(key string) {
+				defer wg.Done()
+
 				if userID, isValidUserKey := IsValidUserKey(key); isValidUserKey {
 					decodedKey, decodeErr := decodeKey(userID)
 					if decodeErr != nil {
 						s.plugin.API.LogError("Unable to decode key", "UserID", userID, "Error", decodeErr.Error())
-						continue
+						return
 					}
 
 					user, loadErr := s.LoadUser(decodedKey)
 					if loadErr != nil {
 						s.plugin.API.LogError("Unable to load user", "UserID", userID, "Error", loadErr.Error())
-						continue
+						return
 					}
 
+					// Append the loaded user to the users slice under a lock.
+					mu.Lock()
 					users = append(users, &serializer.IncidentCaller{
 						MattermostUserID: user.MattermostUserID,
 						Username:         user.Username,
 						ServiceNowUser:   user.ServiceNowUser,
 					})
+					mu.Unlock()
 				}
-			}
-		}(kvList)
+			}(key)
+		}
 
+		// Wait for all goroutines to complete before continuing.
 		wg.Wait()
 
 		if len(kvList) < constants.DefaultPerPage {
@@ -133,10 +140,10 @@ func (s *pluginStore) GetAllUsers() ([]*serializer.IncidentCaller, error) {
 	return users, nil
 }
 
-func (s *pluginStore) DeleteUserTokenOnEncryptionSecretChange(ch chan error) {
+func (s *pluginStore) DeleteUserTokenOnEncryptionSecretChange() {
 	users, err := s.GetAllUsers()
 	if err != nil {
-		ch <- err
+		s.plugin.API.LogError(constants.ErrorGetUsers, "Error", err.Error())
 		return
 	}
 
