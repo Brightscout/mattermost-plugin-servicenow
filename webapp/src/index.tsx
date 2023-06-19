@@ -47,7 +47,7 @@ export default class Plugin {
         registry.registerChannelHeaderButtonAction(<ServiceNowIcon className='servicenow-icon'/>, () => store.dispatch(toggleRHSPlugin), null, Constants.ChannelHeaderTooltipText);
         registry.registerAdminConsoleCustomSetting('ServiceNowUpdateSetDownload', DownloadButton);
 
-        // Store the Mattermost site url in cookies
+        // Store the Mattermost site URL in cookies
         Cookies.set(Constants.SiteUrl, store.getState().entities.general.config.SiteURL as string);
 
         const iconUrl = `${Utils.getBaseUrls().publicFilesUrl}${Constants.SERVICENOW_ICON_URL}`;
