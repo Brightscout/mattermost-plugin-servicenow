@@ -55,13 +55,13 @@ const AddOrViewComments = () => {
     const getCommentsState = () => {
         const payload = getCommentsPayload();
         const {isLoading, isSuccess, isError, data, error: apiErr} = getApiState(Constants.pluginApiServiceConfigs.getComments.apiServiceName, payload);
-        return {isLoading, isSuccess, isError, data: data as string, error: (apiErr as FetchBaseQueryError)?.data as APIError | undefined};
+        return {isLoading, isSuccess, isError, data: data as string, error: apiErr};
     };
 
     const addCommentState = () => {
         const payload = getCommentsPayload();
         const {isLoading, isSuccess, isError, error: apiErr} = getApiState(Constants.pluginApiServiceConfigs.addComments.apiServiceName, payload);
-        return {isLoading, isSuccess, isError, error: (apiErr as FetchBaseQueryError)?.data as APIError | undefined};
+        return {isLoading, isSuccess, isError, error: apiErr};
     };
 
     const addComment = () => {

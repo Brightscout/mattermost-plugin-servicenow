@@ -73,8 +73,8 @@ const ShareRecords = () => {
     }, []);
 
     const getShareRecordState = () => {
-        const {isLoading, isSuccess, isError, error: apiErr} = getApiState(Constants.pluginApiServiceConfigs.shareRecord.apiServiceName, shareRecordPayload as ShareRecordPayload);
-        return {isLoading, isSuccess, isError, error: (apiErr as FetchBaseQueryError)?.data as APIError | undefined};
+        const {isLoading, isSuccess, isError, error} = getApiState(Constants.pluginApiServiceConfigs.shareRecord.apiServiceName, shareRecordPayload as ShareRecordPayload);
+        return {isLoading, isSuccess, isError, error};
     };
 
     useEffect(() => {

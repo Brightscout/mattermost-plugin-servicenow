@@ -48,13 +48,13 @@ const Rhs = (): JSX.Element => {
     const [resetFilter, setResetFilter] = useState(false);
 
     const getSubscriptionsState = () => {
-        const {isLoading, isSuccess, isError, data, error: apiErr} = getApiState(Constants.pluginApiServiceConfigs.fetchSubscriptions.apiServiceName, fetchSubscriptionParams as FetchSubscriptionsParams);
-        return {isLoading, isSuccess, isError, data: data as SubscriptionData[], error: (apiErr as FetchBaseQueryError)?.data as APIError | undefined};
+        const {isLoading, isSuccess, isError, data, error} = getApiState(Constants.pluginApiServiceConfigs.fetchSubscriptions.apiServiceName, fetchSubscriptionParams as FetchSubscriptionsParams);
+        return {isLoading, isSuccess, isError, data: data as SubscriptionData[], error};
     };
 
     const getDeleteSubscriptionState = () => {
-        const {isLoading, isSuccess, isError, data, error: apiErr} = getApiState(Constants.pluginApiServiceConfigs.deleteSubscription.apiServiceName, toBeDeleted as string);
-        return {isLoading, isSuccess, isError, data: data as SubscriptionData[], error: (apiErr as FetchBaseQueryError)?.data as APIError | undefined};
+        const {isLoading, isSuccess, isError, data, error} = getApiState(Constants.pluginApiServiceConfigs.deleteSubscription.apiServiceName, toBeDeleted as string);
+        return {isLoading, isSuccess, isError, data: data as SubscriptionData[], error};
     };
 
     // Reset the pagination params and empty the subscription list

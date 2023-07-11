@@ -88,13 +88,13 @@ const AddOrEditSubscription = ({open, close, subscriptionData}: AddOrEditSubscri
     // Get create subscription state
     const getCreateSubscriptionState = () => {
         const {isLoading, isSuccess, isError, data, error: apiErr} = getApiState(Constants.pluginApiServiceConfigs.createSubscription.apiServiceName, createSubscriptionPayload as CreateSubscriptionPayload);
-        return {isLoading, isSuccess, isError, data: data as RecordData, error: (apiErr as FetchBaseQueryError)?.data as APIError | undefined};
+        return {isLoading, isSuccess, isError, data: data as RecordData, error: apiErr};
     };
 
     // Get edit subscription state
     const getEditSubscriptionState = () => {
         const {isLoading, isSuccess, isError, data, error: apiErr} = getApiState(Constants.pluginApiServiceConfigs.editSubscription.apiServiceName, editSubscriptionPayload as EditSubscriptionPayload);
-        return {isLoading, isSuccess, isError, data: data as RecordData, error: (apiErr as FetchBaseQueryError)?.data as APIError | undefined};
+        return {isLoading, isSuccess, isError, data: data as RecordData, error: apiErr};
     };
 
     useEffect(() => {

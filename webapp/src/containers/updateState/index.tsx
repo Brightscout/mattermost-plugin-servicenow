@@ -43,12 +43,12 @@ const UpdateState = () => {
 
     const getStateForGetStatesAPI = () => {
         const {isLoading, isSuccess, isError, data, error: apiErr} = getApiState(Constants.pluginApiServiceConfigs.getStates.apiServiceName, getStatesParams as GetStatesParams);
-        return {isLoading, isSuccess, isError, data: data as StateData[], error: (apiErr as FetchBaseQueryError)?.data as APIError | undefined};
+        return {isLoading, isSuccess, isError, data: data as StateData[], error: apiErr};
     };
 
     const getStateForUpdateStateAPI = () => {
         const {isLoading, isSuccess, isError, error: apiErr} = getApiState(Constants.pluginApiServiceConfigs.updateState.apiServiceName, updateStatePayload as UpdateStatePayload);
-        return {isLoading, isSuccess, isError, error: (apiErr as FetchBaseQueryError)?.data as APIError | undefined};
+        return {isLoading, isSuccess, isError, error: apiErr};
     };
 
     useEffect(() => {
