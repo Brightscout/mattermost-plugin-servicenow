@@ -56,7 +56,7 @@ const RhsData = ({
 
     const getChannelState = useCallback(() => {
         const {isLoading, isSuccess, isError, data, error: apiErr} = getApiState(Constants.pluginApiServiceConfigs.getChannels.apiServiceName, {teamId: currentTeamId});
-        return {isLoading, isSuccess, isError, data: data as ChannelData[], error: (apiErr as APIError | undefined)?.message};
+        return {isLoading, isSuccess, isError, data: data as ChannelData[], error: apiErr};
     }, [getApiState, currentTeamId]);
 
     const getConfigState = () => {
