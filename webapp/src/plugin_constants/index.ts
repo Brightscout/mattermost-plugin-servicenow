@@ -46,7 +46,6 @@ const IncidentCreatedMsg = 'Incident created successfully!';
 const ChannelPanelToggleLabel = 'Subscribe to the new incident';
 const MaxShortDescriptionCharactersView = 75;
 const MaxShortDescriptionLimit = 160;
-const SiteUrl = 'SITEURL';
 
 export enum SubscriptionEvents {
     CREATED = 'created',
@@ -98,7 +97,6 @@ export const SubscriptionTypeLabelMap: Record<SubscriptionType, string> = {
 export const RecordTypeLabelMap: Record<RecordType, string> = {
     [RecordType.INCIDENT]: 'Incident',
     [RecordType.PROBLEM]: 'Problem',
-    [RecordType.CHANGE_REQUEST]: 'Change Request',
     [RecordType.CHANGE_REQUEST]: 'Change Request',
     [RecordType.KNOWLEDGE]: 'Knowledge',
     [RecordType.TASK]: 'Task',
@@ -373,5 +371,4 @@ export default {
     ChannelPanelToggleLabel,
     MaxShortDescriptionCharactersView,
     MaxShortDescriptionLimit,
-    SiteUrl,
 };

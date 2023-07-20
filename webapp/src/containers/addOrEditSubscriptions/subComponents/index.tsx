@@ -278,7 +278,7 @@ const AddOrEditSubscription = ({open, close, subscriptionData}: AddOrEditSubscri
     // Returns heading for the result panel
     const getResultPanelHeader = useCallback(() => {
         if (apiError && apiResponseValid) {
-            return Utils.getResultPanelHeader(apiError, hideModal);
+            return Utils.getResultPanelHeader(apiError, hideModal, SiteURL);
         } else if (subscriptionData) {
             return Constants.SubscriptionUpdatedMsg;
         }

@@ -1,9 +1,11 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {FetchBaseQueryError} from '@reduxjs/toolkit/dist/query';
 
 import {CircularLoader, CustomModal as Modal, ModalFooter, ModalHeader, ModalLoader, ModalSubtitleAndError, ResultPanel, TextArea} from '@brightscout/mattermost-ui-library';
+
+import {GlobalState} from 'mattermost-webapp/types/store';
 
 import usePluginApi from 'src/hooks/usePluginApi';
 
@@ -24,6 +26,7 @@ const AddOrViewComments = () => {
     const [apiError, setApiError] = useState<APIError | null>(null);
     const [showErrorPanel, setShowErrorPanel] = useState(false);
     const [refetch, setRefetch] = useState(false);
+    const {SiteURL} = useSelector((state: GlobalState) => state.entities.general.config);
 
     // usePluginApi hook
     const {pluginState, makeApiRequest, getApiState} = usePluginApi();
@@ -145,7 +148,7 @@ const AddOrViewComments = () => {
                 {showModalLoader && !comments && <CircularLoader/>}
                 {(showErrorPanel && apiError) ? (
                     <ResultPanel
-                        header={Utils.getResultPanelHeader(apiError, hideModal)}
+                        header={Utils.getResultPanelHeader(apiError, hideModal, SiteURL)}
                         className='wizard__secondary-panel--slide-in result-panel'
                         primaryBtn={{
                             text: 'Close',

@@ -1,8 +1,10 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {FetchBaseQueryError} from '@reduxjs/toolkit/dist/query';
 
 import {CircularLoader, CustomModal as Modal, Dropdown, ModalFooter, ModalHeader, ResultPanel} from '@brightscout/mattermost-ui-library';
+
+import {GlobalState} from 'mattermost-webapp/types/store';
 
 import usePluginApi from 'src/hooks/usePluginApi';
 
@@ -19,6 +21,7 @@ const UpdateState = () => {
     const [getStatesParams, setGetStatesParams] = useState<GetStatesParams | null>(null);
     const [updateStatePayload, setUpdateStatePayload] = useState<UpdateStatePayload | null>(null);
     const [showResultPanel, setShowResultPanel] = useState(false);
+    const {SiteURL} = useSelector((state: GlobalState) => state.entities.general.config);
 
     // usePluginApi hook
     const {pluginState, makeApiRequest, getApiState} = usePluginApi();
@@ -121,7 +124,7 @@ const UpdateState = () => {
                 {showResultPanel ? (
                     <ResultPanel
                         className='wizard__secondary-panel--slide-in result-panel'
-                        header={Utils.getResultPanelHeader(apiError, hideModal, Constants.StateUpdatedMsg)}
+                        header={Utils.getResultPanelHeader(apiError, hideModal, SiteURL, Constants.StateUpdatedMsg)}
                         primaryBtn={{
                             text: 'Close',
                             onClick: hideModal,

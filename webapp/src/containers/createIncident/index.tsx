@@ -209,7 +209,7 @@ const CreateIncident = () => {
                 {showModalLoader && <CircularLoader/>}
                 {showResultPanel || apiError ? (
                     <ResultPanel
-                        header={Utils.getResultPanelHeader(apiError, hideModal, Constants.IncidentCreatedMsg)}
+                        header={Utils.getResultPanelHeader(apiError, hideModal, SiteURL, Constants.IncidentCreatedMsg)}
                         className={`${(showResultPanel || apiError) ? 'wizard__secondary-panel--slide-in result-panel' : ''}`}
                         primaryBtn={{
                             text: getResultPanelPrimaryBtnActionOrText(false) as string,
