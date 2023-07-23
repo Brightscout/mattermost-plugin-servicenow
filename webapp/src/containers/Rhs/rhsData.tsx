@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {GlobalState} from 'mattermost-webapp/types/store';
-import {FetchBaseQueryError} from '@reduxjs/toolkit/dist/query';
 import {useDispatch, useSelector} from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroll-component';
 

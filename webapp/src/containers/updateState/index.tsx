@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {FetchBaseQueryError} from '@reduxjs/toolkit/dist/query';
 
 import {CircularLoader, CustomModal as Modal, Dropdown, ModalFooter, ModalHeader, ResultPanel} from '@brightscout/mattermost-ui-library';
 

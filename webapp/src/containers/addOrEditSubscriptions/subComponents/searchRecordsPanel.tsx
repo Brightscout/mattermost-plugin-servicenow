@@ -1,5 +1,4 @@
 import React, {forwardRef, useCallback, useEffect, useState} from 'react';
-import {FetchBaseQueryError} from '@reduxjs/toolkit/dist/query';
 
 import {ModalSubtitleAndError, ModalFooter, AutoSuggest, SkeletonLoader} from '@brightscout/mattermost-ui-library';
 

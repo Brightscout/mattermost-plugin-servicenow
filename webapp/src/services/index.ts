@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import {BaseQueryApi} from '@reduxjs/toolkit/dist/query/baseQueryTypes';
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
 import Cookies from 'js-cookie';

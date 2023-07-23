@@ -1,8 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {FetchBaseQueryError} from '@reduxjs/toolkit/dist/query';
-
 import {CircularLoader, CustomModal as Modal, ModalFooter, ModalHeader, ModalLoader, ModalSubtitleAndError, ResultPanel, TextArea} from '@brightscout/mattermost-ui-library';
 
 import {GlobalState} from 'mattermost-webapp/types/store';

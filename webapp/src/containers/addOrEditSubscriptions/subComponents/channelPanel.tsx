@@ -2,7 +2,6 @@ import React, {forwardRef, useCallback, useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 import {GlobalState} from 'mattermost-webapp/types/store';
 import {General as MMConstants} from 'mattermost-redux/constants';
-import {FetchBaseQueryError} from '@reduxjs/toolkit/dist/query';
 
 import {ModalSubtitleAndError, ModalFooter, AutoSuggest} from '@brightscout/mattermost-ui-library';
 

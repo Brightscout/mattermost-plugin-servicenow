@@ -2,8 +2,6 @@ import React, {useEffect, useState} from 'react';
 
 import {AutoSuggest} from '@brightscout/mattermost-ui-library';
 
-import {FetchBaseQueryError} from '@reduxjs/toolkit/dist/query';
-
 import Constants from 'src/plugin_constants';
 import usePluginApi from 'src/hooks/usePluginApi';
 
