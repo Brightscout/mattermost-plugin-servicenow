@@ -310,7 +310,7 @@ func decodeKey(key string) (string, error) {
 
 func (p *Plugin) HasChannelPermissions(userID, channelID string) (int, error) {
 	if !p.API.HasPermissionToChannel(userID, channelID, model.PermissionCreatePost) {
-		p.API.LogDebug(constants.ErrorChannelPermissionsForUser)
+		p.API.LogDebug(constants.ErrorChannelPermissionsForUser, "UserID", userID, "ChannelID", channelID)
 		return http.StatusForbidden, fmt.Errorf(constants.ErrorInsufficientPermissions)
 	}
 
@@ -326,11 +326,12 @@ func (p *Plugin) HasPublicOrPrivateChannelPermissions(userID, channelID string) 
 
 	// Check if a channel is direct message or group channel
 	if channel.Type == model.ChannelTypeDirect || channel.Type == model.ChannelTypeGroup {
+		p.API.LogDebug(constants.ErrorInvalidChannelType, "ChannelType", channel.Type)
 		return http.StatusBadRequest, fmt.Errorf(constants.ErrorInvalidChannelType)
 	}
 
 	if !p.API.HasPermissionToChannel(userID, channelID, model.PermissionCreatePost) {
-		p.API.LogDebug(constants.ErrorChannelPermissionsForUser)
+		p.API.LogDebug(constants.ErrorChannelPermissionsForUser, "UserID", userID, "ChannelID", channelID)
 		return http.StatusForbidden, fmt.Errorf(constants.ErrorInsufficientPermissions)
 	}
 
