@@ -1897,7 +1897,7 @@ func TestCreateIncident(t *testing.T) {
 		"does not have permission to access the channel": {
 			RequestBody: testutils.GetCreateIncidentPayload(),
 			SetupAPI: func(api *plugintest.API) {
-				api.On("LogDebug", mock.AnythingOfType("string")).Return()
+				api.On("LogDebug", testutils.GetMockArgumentsWithType("string", 5)...).Return()
 				api.On("HasPermissionToChannel", testutils.GetID(), testutils.GetChannelID(), model.PermissionCreatePost).Return(false)
 			},
 			SetupPlugin:          func(p *Plugin) {},
