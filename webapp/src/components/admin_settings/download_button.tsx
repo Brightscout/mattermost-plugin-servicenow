@@ -7,7 +7,7 @@ import {GlobalState} from 'mattermost-webapp/types/store';
 
 import Utils from 'src/utils';
 
-import {UPLOAD_SET_FILENAME} from 'src/plugin_constants';
+import {UPDATE_SET_FILENAME} from 'src/plugin_constants';
 
 type HelpText = {
     key: string | null;
@@ -37,7 +37,7 @@ const DownloadButton = ({label, helpText}: Props) => {
             </Col>
             <Col sm={8}>
                 <a
-                    href={Utils.getBaseUrls(SiteURL as string).publicFilesUrl + UPLOAD_SET_FILENAME}
+                    href={Utils.getBaseUrls(SiteURL).publicFilesUrl + UPDATE_SET_FILENAME}
                     download={true}
                 >
                     <Button>

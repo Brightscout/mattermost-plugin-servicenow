@@ -17,7 +17,7 @@ const handleBaseQuery = async (
 ) => {
     const globalReduxState = api.getState() as GlobalState;
     const result = await fetchBaseQuery({
-        baseUrl: Utils.getBaseUrls(globalReduxState?.entities?.general?.config?.SiteURL as string).pluginApiBaseUrl,
+        baseUrl: Utils.getBaseUrls(globalReduxState?.entities?.general?.config?.SiteURL).pluginApiBaseUrl,
         prepareHeaders: (headers) => {
             headers.set(Constants.HeaderCSRFToken, Cookies.get(Constants.MMCSRF) ?? '');
 

@@ -8,7 +8,7 @@ import {EmptyState, CircularLoader, ServiceNowIcon, UnlinkIcon, ConfirmationDial
 
 import usePluginApi from 'src/hooks/usePluginApi';
 
-import Constants, {SubscriptionEventsMap, CONNECT_ACCOUNT_LINK, UPLOAD_SET_FILENAME} from 'src/plugin_constants';
+import Constants, {SubscriptionEventsMap, CONNECT_ACCOUNT_LINK, UPDATE_SET_FILENAME} from 'src/plugin_constants';
 
 import {refetch, resetRefetch} from 'src/reducers/refetchState';
 
@@ -260,7 +260,7 @@ const Rhs = (): JSX.Element => {
                                 subTitle={isCurrentUserSysAdmin ? Constants.SubscriptionsConfigErrorSubtitleForAdmin : Constants.SubscriptionsConfigErrorSubtitleForUser}
                                 buttonConfig={isCurrentUserSysAdmin ? ({
                                     text: 'Download update set',
-                                    link: Utils.getBaseUrls(SiteURL as string).publicFilesUrl + UPLOAD_SET_FILENAME,
+                                    link: Utils.getBaseUrls(SiteURL).publicFilesUrl + UPDATE_SET_FILENAME,
                                     download: true,
                                 }) : null
                                 }
@@ -283,7 +283,7 @@ const Rhs = (): JSX.Element => {
                         title='No Account Connected'
                         buttonConfig={{
                             text: 'Connect your account',
-                            link: Utils.getBaseUrls(SiteURL as string).pluginApiBaseUrl + CONNECT_ACCOUNT_LINK,
+                            link: Utils.getBaseUrls(SiteURL).pluginApiBaseUrl + CONNECT_ACCOUNT_LINK,
                         }}
                         className='configuration-err-state'
                         icon={<ServiceNowIcon className='account-not-connected-icon rhs-state-icon'/>}

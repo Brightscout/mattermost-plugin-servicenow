@@ -10,7 +10,7 @@ import Constants, {SubscriptionType, RecordType, KnowledgeRecordDataLabelConfigK
 
 import {id as pluginId} from '../manifest';
 
-const getBaseUrls = (mmSiteUrl: string): {
+const getBaseUrls = (mmSiteUrl?: string): {
     pluginApiBaseUrl: string;
     mattermostApiBaseUrl: string;
     publicFilesUrl: string;
@@ -84,7 +84,7 @@ const getContentForResultPanelWhenDisconnected = (message: string, onClick: () =
         <a
             target='_blank'
             rel='noreferrer'
-            href={getBaseUrls(mmSiteUrl as string).pluginApiBaseUrl + CONNECT_ACCOUNT_LINK}
+            href={getBaseUrls(mmSiteUrl).pluginApiBaseUrl + CONNECT_ACCOUNT_LINK}
         >
             <Button
                 text='Connect your account'
